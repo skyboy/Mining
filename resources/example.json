@@ -1,0 +1,1 @@
+{ 	"ThermalFoundation:Ore": { 		drops: { 			0: bedrock, 			1: stone, 			2: [grass, dirt] 		}, 		enabled: true, 		uses: 9, 		variability: 0 	} } 
