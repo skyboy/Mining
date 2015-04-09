@@ -36,9 +36,9 @@ public class BlockOverrideOre extends Block implements ITileEntityProvider {
 	private static Random rand = new Random();
 	protected Block _override;
 	protected WeightedRandomItemStack[][] drops;
-	protected int uses, var;
+	protected int[] uses, var;
 
-	public BlockOverrideOre(Block override, WeightedRandomItemStack[][] drops, int uses, int var) {
+	public BlockOverrideOre(Block override, WeightedRandomItemStack[][] drops, int[] uses, int[] var) {
 
 		super(override.getMaterial());
 		_override = override;
@@ -92,11 +92,17 @@ public class BlockOverrideOre extends Block implements ITileEntityProvider {
 	}
 
 	@Override
+	public boolean canSilkHarvest() {
+
+		return false;
+	}
+
+	@Override
 	public ArrayList<ItemStack> getDrops(World world, int x, int y, int z, int metadata, int fortune) {
 
 		ArrayList<ItemStack> ret = new ArrayList<ItemStack>();
 		if (drops[metadata] != null) {
-			ret.add(((WeightedRandomItemStack)WeightedRandom.getRandomItem(world.rand, drops[metadata])).getStack());
+			ret.add(((WeightedRandomItemStack) WeightedRandom.getRandomItem(world.rand, drops[metadata])).getStack());
 		}
 		return ret;
 	}
@@ -428,7 +434,7 @@ public class BlockOverrideOre extends Block implements ITileEntityProvider {
 		TileEntity tile = world.getTileEntity(x, y, z);
 		if (tile instanceof Tile) {
 			tile.markDirty();
-			if (--((Tile)tile).uses > 0) {
+			if (--((Tile) tile).uses > 0) {
 				world.setBlock(x, y, z, block, meta, 2);
 			} else {
 				_override.breakBlock(world, x, y, z, block, meta);
@@ -441,7 +447,7 @@ public class BlockOverrideOre extends Block implements ITileEntityProvider {
 	@Override
 	public TileEntity createNewTileEntity(World world, int metadata) {
 
-		return new Tile();
+		return new Tile(this, metadata);
 	}
 
 	@Override
@@ -450,9 +456,18 @@ public class BlockOverrideOre extends Block implements ITileEntityProvider {
 		_override.onBlockExploded(world, x, y, z, explosion);
 	}
 
-	private class Tile extends TileEntity {
+	public static class Tile extends TileEntity {
 
-		public int uses = BlockOverrideOre.this.uses + (var > 0 ? rand.nextInt(var + 1) : 0);
+		public Tile() {
+
+		}
+
+		public Tile(BlockOverrideOre ore, int meta) {
+
+			uses = ore.uses[meta] + (ore.var[meta] > 0 ? rand.nextInt(ore.var[meta] + 1) : 0);
+		}
+
+		public int uses;
 
 		@Override
 		public void readFromNBT(NBTTagCompound tag) {
@@ -473,8 +488,8 @@ public class BlockOverrideOre extends Block implements ITileEntityProvider {
 		@Override
 		public boolean shouldRefresh(Block oldBlock, Block newBlock, int oldMeta, int newMeta, World world, int x, int y, int z) {
 
-	        return world.isRemote;
-	    }
+			return world.isRemote;
+		}
 
 		@Override
 		public boolean canUpdate() {

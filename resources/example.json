@@ -1,1 +1,1 @@
-{ 	"ThermalFoundation:Ore": { 		drops: { 			0: bedrock, 			1: stone, 			2: [grass, dirt] 		}, 		enabled: true, 		uses: 9, 		variability: 0 	} } 
+{	"ThermalFoundation:Ore": {		drops: {			0: bedrock,			1: stone,			2: [grass, dirt]		},		enabled: true,		uses: 9,		variability: 0	},	"minecraft:gold_ore": {		drops: {			0: gold_nugget,			1: {				name: "ThermalFoundation:material",				meta: 1,				weight: 50,				nbt: "{display:{Name:\u00A7rGold Ore}}"			}		},		enabled: true,		uses: {			0: 3,			1: 1		},		variability: {			0: 6,			1: 0		}	}}

@@ -23,6 +23,8 @@ import java.util.Arrays;
 import java.util.Map.Entry;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.ITileEntityProvider;
+import net.minecraft.init.Blocks;
 
 @Mod(modid = Mining.modId, name = Mining.modName, version = Mining.version, dependencies = Mining.dependencies,
 		customProperties = @CustomProperty(k = "cofhversion", v = "true"))
@@ -87,6 +89,10 @@ public class Mining extends BaseMod {
 					JsonObject obj = genEntry.getValue().getAsJsonObject();
 					String name = genEntry.getKey();
 					Block ore = Block.getBlockFromName(name);
+					if (ore == null) {
+						_log.debug(name + " is not a block.");
+						continue;
+					}
 					if (isBlockInvalid(ore)) {
 						_log.error(name + " cannot be replaced.");
 						continue;
@@ -100,7 +106,7 @@ public class Mining extends BaseMod {
 						JsonObject data = obj.get("drops").getAsJsonObject();
 						for (int i = 0; i < 16; ++i) {
 							if (!data.has(String.valueOf(i)))
-									continue;
+								continue;
 							ArrayList<WeightedRandomItemStack> list = new ArrayList<WeightedRandomItemStack>();
 							if (!FeatureParser.parseWeightedItemList(data.get(String.valueOf(i)), list)) {
 								_log.error("Failed to parse drops for " + name + "#" + i);
@@ -110,8 +116,35 @@ public class Mining extends BaseMod {
 						}
 					}
 
-					int u = obj.has("uses") ? obj.get("uses").getAsInt() : 9;
-					int v = obj.has("variability") ? obj.get("variability").getAsInt() : 0;
+					int[] u = new int[16], v = new int[16];
+					if (obj.has("uses")) {
+						JsonElement ele = obj.get("uses");
+						if (ele.isJsonPrimitive()) {
+							for (int i = u.length, d = ele.getAsInt(); i-- > 0;) {
+								u[i] = d;
+							}
+						} else {
+							JsonObject d = ele.getAsJsonObject();
+							for (int i = u.length; i-- > 0;) {
+								if (d.has(String.valueOf(i)))
+									u[i] = d.get(String.valueOf(i)).getAsInt();
+							}
+						}
+					}
+					if (obj.has("variability")) {
+						JsonElement ele = obj.get("variability");
+						if (ele.isJsonPrimitive()) {
+							for (int i = v.length, d = ele.getAsInt(); i-- > 0;) {
+								v[i] = d;
+							}
+						} else {
+							JsonObject d = ele.getAsJsonObject();
+							for (int i = v.length; i-- > 0;) {
+								if (d.has(String.valueOf(i)))
+									v[i] = d.get(String.valueOf(i)).getAsInt();
+							}
+						}
+					}
 
 					RegistryUtils.overwriteEntry(Block.blockRegistry, name, new BlockOverrideOre(ore, drops, u, v));
 
@@ -122,12 +155,23 @@ public class Mining extends BaseMod {
 		}
 
 		_log.info("Load Complete.");
-		UpdateManager.registerUpdater(new UpdateManager(this, "https://raw.github.com/skyboy/Mining/master/VERSION", CoFHProps.DOWNLOAD_URL));
+		UpdateManager.registerUpdater(new UpdateManager(this, "https://raw.github.com/skyboy/Mining/master/VERSION",
+				CoFHProps.DOWNLOAD_URL));
 	}
 
 	private boolean isBlockInvalid(Block block) {
 
-		return Block.getIdFromBlock(block) <= 175; // TODO: 175 (in 1.7.2)
+		if (block == Blocks.air || block instanceof ITileEntityProvider)
+			return true;
+		for (int i = 16; i-- > 0;) {
+			try {
+				if (block.hasTileEntity(i)) {
+					return true;
+				}
+			} catch (Throwable _) {
+			}
+		}
+		return false;
 	}
 
 	@Override
