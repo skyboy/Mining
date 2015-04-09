@@ -40,6 +40,8 @@ public class Mining extends BaseMod {
 	public void preinit(FMLPreInitializationEvent evt) {
 
 		setConfigFolderBase(evt.getModConfigurationDirectory());
+		if (!_configFolder.exists())
+			_configFolder.mkdirs();
 	}
 
 	private static void addFiles(ArrayList<File> list, File folder) {
