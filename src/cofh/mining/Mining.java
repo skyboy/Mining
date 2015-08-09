@@ -20,6 +20,7 @@ import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Map.Entry;
 
 import net.minecraft.block.Block;
@@ -54,7 +55,7 @@ public class Mining extends BaseMod {
 				if (name == null) {
 					return false;
 				}
-				return name.toLowerCase().endsWith(".json") || new File(file, name).isDirectory();
+				return name.toLowerCase(Locale.US).endsWith(".json") || new File(file, name).isDirectory();
 			}
 		});
 

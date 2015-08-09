@@ -69,9 +69,37 @@ public class BlockOverrideOre extends Block implements ITileEntityProvider {
 		return _override.hashCode();
 	}
 
-	/**
-	 * Overrides to proxy to the overridden block
-	 */
+	/** Overrides to proxy to the overridden block */
+
+	@Override
+	public void setHarvestLevel(String toolClass, int level) {
+
+		_override.setHarvestLevel(toolClass, level);
+	}
+
+	@Override
+	public void setHarvestLevel(String toolClass, int level, int metadata) {
+
+		_override.setHarvestLevel(toolClass, level, metadata);
+	}
+
+	@Override
+	public String getHarvestTool(int metadata) {
+
+		return _override.getHarvestTool(metadata);
+	}
+
+	@Override
+	public int getHarvestLevel(int metadata) {
+
+		return _override.getHarvestLevel(metadata);
+	}
+
+	@Override
+	public boolean isToolEffective(String type, int metadata) {
+
+		return _override.isToolEffective(type, metadata);
+	}
 
 	@Override
 	public boolean canHarvestBlock(EntityPlayer player, int meta) {
@@ -89,6 +117,12 @@ public class BlockOverrideOre extends Block implements ITileEntityProvider {
 	public int damageDropped(int meta) {
 
 		return _override.damageDropped(meta);
+	}
+
+	@Override
+	public boolean canSilkHarvest(World world, EntityPlayer player, int x, int y, int z, int metadata) {
+
+		return false;
 	}
 
 	@Override
@@ -202,12 +236,6 @@ public class BlockOverrideOre extends Block implements ITileEntityProvider {
 	public int getFireSpreadSpeed(IBlockAccess world, int x, int y, int z, ForgeDirection face) {
 
 		return _override.getFireSpreadSpeed(world, x, y, z, face);
-	}
-
-	@Override
-	public boolean canSilkHarvest(World world, EntityPlayer player, int x, int y, int z, int metadata) {
-
-		return false;
 	}
 
 	@Override
